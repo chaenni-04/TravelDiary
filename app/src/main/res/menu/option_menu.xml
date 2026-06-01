@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menu_sort_date"
+        android:title="날짜순 정렬"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_sort_name"
+        android:title="이름순 정렬"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_delete_all"
+        android:title="전체 삭제"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_app_info"
+        android:title="앱 정보"
+        app:showAsAction="never" />
+</menu>

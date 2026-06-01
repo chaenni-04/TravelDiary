@@ -1,5 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- 포레스트 그린 메인 색상 -->
+    <color name="primary">#2E6B4A</color>
+    <color name="primary_dark">#1F4D34</color>
+    <color name="primary_light">#4A9B6F</color>
+    <color name="primary_very_light">#EAF3DE</color>
+    <color name="accent_green">#97C459</color>
+
+    <!-- 포인트 색상 (버튼, FAB) -->
+    <color name="accent_coral">#E07050</color>
+    <color name="accent_coral_light">#FFF0EB</color>
+
+    <!-- 배경 -->
+    <color name="bg_main">#F2F7F0</color>
+    <color name="bg_card">#FFFFFF</color>
+    <color name="bg_input">#F8FBF6</color>
+
+    <!-- 텍스트 -->
+    <color name="text_primary">#1A2E22</color>
+    <color name="text_secondary">#5A7A65</color>
+    <color name="text_hint">#9DB8A6</color>
+
+    <!-- 구분선 -->
+    <color name="divider">#DCE8D8</color>
+
+    <!-- 기타 -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="delete_red">#D94F4F</color>
 </resources>
