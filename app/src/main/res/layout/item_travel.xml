@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp"
+    style="@style/TravelCard">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- 사진 영역 -->
+        <FrameLayout
+            android:layout_width="100dp"
+            android:layout_height="100dp">
+
+            <ImageView
+                android:id="@+id/iv_thumbnail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@android:drawable/ic_menu_gallery"
+                android:background="@color/primary_very_light"/>
+
+            <!-- 코루틴 로딩 중 ProgressBar -->
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                android:indeterminateTint="@color/primary"/>
+
+            <!-- 사진 없을 때 아이콘 영역 -->
+            <LinearLayout
+                android:id="@+id/layout_no_photo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@color/primary_very_light"
+                android:visibility="visible">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📷"
+                    android:textSize="28sp"/>
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <!-- 텍스트 영역 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="14dp"
+            android:gravity="center_vertical">
+
+            <!-- 여행지명 -->
+            <TextView
+                android:id="@+id/tv_place"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="여행지명"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"/>
+
+            <!-- 날짜 -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="5dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📅 "
+                    android:textSize="11sp"/>
+
+                <TextView
+                    android:id="@+id/tv_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2026-06-01"
+                    android:textSize="12sp"
+                    android:textColor="@color/text_secondary"/>
+
+            </LinearLayout>
+
+            <!-- 메모 미리보기 -->
+            <TextView
+                android:id="@+id/tv_memo_preview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="메모 미리보기..."
+                android:textSize="13sp"
+                android:textColor="@color/text_hint"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:layout_marginTop="6dp"/>
+
+        </LinearLayout>
+
+        <!-- 오른쪽 화살표 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="›"
+            android:textSize="24sp"
+            android:textColor="@color/text_hint"
+            android:gravity="center_vertical"
+            android:paddingEnd="14dp"/>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

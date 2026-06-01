@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_main">
+
+    <!-- 빈 목록일 때 보여줄 뷰 -->
+    <LinearLayout
+        android:id="@+id/layout_empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🗺️"
+            android:textSize="64sp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="아직 여행 기록이 없어요"
+            android:textSize="18sp"
+            android:textColor="@color/text_secondary"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="아래 + 버튼을 눌러 첫 여행을 기록해보세요!"
+            android:textSize="14sp"
+            android:textColor="@color/text_hint"
+            android:layout_marginTop="8dp"/>
+
+    </LinearLayout>
+
+    <!-- RecyclerView -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="12dp"
+        android:paddingBottom="80dp"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:clipToPadding="false"/>
+
+    <!-- FAB -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_margin="20dp"
+        android:src="@android:drawable/ic_input_add"
+        android:contentDescription="새 여행 추가"
+        app:backgroundTint="@color/accent_coral"
+        app:tint="@color/white"
+        app:fabSize="normal"
+        xmlns:app="http://schemas.android.com/apk/res-auto"/>
+
+</FrameLayout>
