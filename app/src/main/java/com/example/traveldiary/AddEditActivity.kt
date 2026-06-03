@@ -44,20 +44,16 @@ class AddEditActivity : AppCompatActivity() {
 
     // 갤러리 런처
     private val galleryLauncher =
-        registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-            if (uri != null) {
+        registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+            uri?.let {
                 try {
                     contentResolver.takePersistableUriPermission(
-                        uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        it, Intent.FLAG_GRANT_READ_URI_PERMISSION
                     )
-                } catch (e: Exception) {
-                    // 일부 URI는 영구 권한 불가 → 무시하고 계속 진행
-                }
-                selectedPhotoUri = uri.toString()
+                } catch (e: Exception) { }
+                selectedPhotoUri = it.toString()
                 showPreview()
-            } else {
-                Toast.makeText(this, "사진 선택이 취소되었습니다", Toast.LENGTH_SHORT).show()
-            }
+            } ?: Toast.makeText(this, "사진 선택이 취소되었습니다", Toast.LENGTH_SHORT).show()
         }
 
     // 권한 요청 런처
@@ -148,7 +144,7 @@ class AddEditActivity : AppCompatActivity() {
             .setItems(arrayOf("📷  카메라로 촬영", "🖼️  갤러리에서 선택")) { _, which ->
                 when (which) {
                     0 -> checkCameraPermission()
-                    1 -> galleryLauncher.launch("image/*")
+                    1 -> galleryLauncher.launch(arrayOf("image/*"))
                 }
             }
             .show()

@@ -10,11 +10,13 @@ import com.example.traveldiary.databinding.ActivityMainBinding
 import com.example.traveldiary.db.DBHelper
 import com.example.traveldiary.fragment.InfoFragment
 import com.example.traveldiary.fragment.ListFragment
+import com.example.traveldiary.fragment.MapFragment
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val listFragment = ListFragment()
+    private val mapFragment = MapFragment()
     private val infoFragment = InfoFragment()
     private var activeFragment: androidx.fragment.app.Fragment = listFragment
 
@@ -23,11 +25,9 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 툴바 설정
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(true)
 
-        // 뒤로가기 처리 (onCreate 안에서)
         onBackPressedDispatcher.addCallback(this) {
             if (supportFragmentManager.backStackEntryCount > 0) {
                 supportFragmentManager.popBackStack()
@@ -39,6 +39,7 @@ class MainActivity : AppCompatActivity() {
         // Fragment 초기 설정
         supportFragmentManager.beginTransaction()
             .add(R.id.fragment_container, infoFragment, "info").hide(infoFragment)
+            .add(R.id.fragment_container, mapFragment, "map").hide(mapFragment)
             .add(R.id.fragment_container, listFragment, "list")
             .commit()
 
@@ -47,7 +48,12 @@ class MainActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.nav_list -> {
                     switchFragment(listFragment)
-                    supportActionBar?.title = "✈ 여행 다이어리"
+                    supportActionBar?.title = "여행 다이어리"
+                    true
+                }
+                R.id.nav_map -> {
+                    switchFragment(mapFragment)
+                    supportActionBar?.title = "여행 지도"
                     true
                 }
                 R.id.nav_info -> {
@@ -68,12 +74,21 @@ class MainActivity : AppCompatActivity() {
             .addToBackStack(null)
             .commit()
         activeFragment = fragment
+        invalidateOptionsMenu()
     }
 
-    // 옵션 메뉴
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.option_menu, menu)
         return true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        val isListFragment = activeFragment is ListFragment
+        menu.findItem(R.id.menu_sort_date).isVisible = isListFragment
+        menu.findItem(R.id.menu_sort_name).isVisible = isListFragment
+        menu.findItem(R.id.menu_delete_all).isVisible = isListFragment
+        menu.findItem(R.id.menu_app_info).isVisible = true
+        return super.onPrepareOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
