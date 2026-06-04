@@ -12,6 +12,16 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
+        <!-- 체크박스 (선택 모드일 때만 보임) -->
+        <CheckBox
+            android:id="@+id/checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="8dp"
+            android:visibility="gone"
+            android:buttonTint="@color/primary"/>
+
         <!-- 사진 영역 -->
         <FrameLayout
             android:layout_width="100dp"
@@ -22,10 +32,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:src="@android:drawable/ic_menu_gallery"
                 android:background="@color/primary_very_light"/>
 
-            <!-- 코루틴 로딩 중 ProgressBar -->
             <ProgressBar
                 android:id="@+id/progress_bar"
                 android:layout_width="32dp"
@@ -34,7 +42,6 @@
                 android:visibility="gone"
                 android:indeterminateTint="@color/primary"/>
 
-            <!-- 사진 없을 때 아이콘 영역 -->
             <LinearLayout
                 android:id="@+id/layout_no_photo"
                 android:layout_width="match_parent"
@@ -63,17 +70,14 @@
             android:padding="14dp"
             android:gravity="center_vertical">
 
-            <!-- 여행지명 -->
             <TextView
                 android:id="@+id/tv_place"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="여행지명"
                 android:textSize="17sp"
                 android:textStyle="bold"
                 android:textColor="@color/text_primary"/>
 
-            <!-- 날짜 -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -91,18 +95,15 @@
                     android:id="@+id/tv_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="2026-06-01"
                     android:textSize="12sp"
                     android:textColor="@color/text_secondary"/>
 
             </LinearLayout>
 
-            <!-- 메모 미리보기 -->
             <TextView
                 android:id="@+id/tv_memo_preview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="메모 미리보기..."
                 android:textSize="13sp"
                 android:textColor="@color/text_hint"
                 android:maxLines="1"
@@ -113,6 +114,7 @@
 
         <!-- 오른쪽 화살표 -->
         <TextView
+            android:id="@+id/tv_arrow"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="›"

@@ -30,7 +30,7 @@ class InfoFragment : Fragment() {
         updateStats()
     }
 
-    private fun updateStats() {
+    fun updateStats() {  // private 아닌지 확인
         val dbHelper = DBHelper(requireContext())
         val allRecords = dbHelper.getAll()
         binding.tvTotalCount.text = allRecords.size.toString()

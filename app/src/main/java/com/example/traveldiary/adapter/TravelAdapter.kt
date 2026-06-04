@@ -19,6 +19,10 @@ class TravelAdapter(
     private val onLongClick: (TravelRecord) -> Unit
 ) : RecyclerView.Adapter<TravelAdapter.ViewHolder>() {
 
+    var isSelectMode = false
+    val selectedItems = mutableSetOf<Int>()
+    var onSelectionChanged: (() -> Unit)? = null  // 추가
+
     inner class ViewHolder(val binding: ItemTravelBinding) :
         RecyclerView.ViewHolder(binding.root)
 
@@ -37,16 +41,34 @@ class TravelAdapter(
         binding.tvDate.text = record.visitDate
         binding.tvMemoPreview.text = record.memo.ifEmpty { "메모 없음" }
 
-        // 클릭
-        binding.root.setOnClickListener { onClick(record) }
+        if (isSelectMode) {
+            binding.checkbox.visibility = View.VISIBLE
+            binding.tvArrow.visibility = View.GONE
+            binding.checkbox.isChecked = selectedItems.contains(record.no)
+        } else {
+            binding.checkbox.visibility = View.GONE
+            binding.tvArrow.visibility = View.VISIBLE
+            binding.checkbox.isChecked = false
+        }
 
-        // 롱클릭 (AlertDialog 방식 컨텍스트 메뉴)
+        binding.root.setOnClickListener {
+            if (isSelectMode) {
+                toggleSelection(record.no)
+            } else {
+                onClick(record)
+            }
+        }
+
         binding.root.setOnLongClickListener {
-            onLongClick(record)
+            if (!isSelectMode) onLongClick(record)
             true
         }
 
-        // 사진이 있으면 코루틴으로 비동기 로딩 (가산점)
+        binding.checkbox.setOnClickListener {
+            toggleSelection(record.no)
+        }
+
+        // 코루틴 비동기 이미지 로딩
         if (record.photoUri.isNotEmpty()) {
             binding.layoutNoPhoto.visibility = View.GONE
             binding.progressBar.visibility = View.VISIBLE
@@ -80,11 +102,39 @@ class TravelAdapter(
         }
     }
 
+    private fun toggleSelection(no: Int) {
+        if (selectedItems.contains(no)) {
+            selectedItems.remove(no)
+        } else {
+            selectedItems.add(no)
+        }
+        notifyDataSetChanged()
+        onSelectionChanged?.invoke()  // 콜백 호출
+    }
+
     override fun getItemCount() = records.size
 
     fun updateData(newList: List<TravelRecord>) {
         records.clear()
         records.addAll(newList)
+        notifyDataSetChanged()
+    }
+
+    fun selectAll() {
+        records.forEach { selectedItems.add(it.no) }
+        notifyDataSetChanged()
+        onSelectionChanged?.invoke()
+    }
+
+    fun clearSelection() {
+        selectedItems.clear()
+        notifyDataSetChanged()
+        onSelectionChanged?.invoke()
+    }
+
+    fun clearSelectMode() {
+        isSelectMode = false
+        selectedItems.clear()
         notifyDataSetChanged()
     }
 }

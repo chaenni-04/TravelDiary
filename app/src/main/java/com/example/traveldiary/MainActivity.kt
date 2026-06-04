@@ -29,7 +29,9 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.setDisplayShowTitleEnabled(true)
 
         onBackPressedDispatcher.addCallback(this) {
-            if (supportFragmentManager.backStackEntryCount > 0) {
+            if (listFragment.isSelectMode()) {
+                listFragment.exitSelectMode()
+            } else if (supportFragmentManager.backStackEntryCount > 0) {
                 supportFragmentManager.popBackStack()
             } else {
                 finish()
@@ -53,7 +55,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.nav_map -> {
                     switchFragment(mapFragment)
-                    supportActionBar?.title = "여행 지도"
+                    supportActionBar?.title = "지도"
                     true
                 }
                 R.id.nav_info -> {
@@ -77,22 +79,28 @@ class MainActivity : AppCompatActivity() {
         invalidateOptionsMenu()
     }
 
+    // onCreateOptionsMenu 수정
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.option_menu, menu)
+        if (activeFragment is ListFragment) {
+            menuInflater.inflate(R.menu.option_menu, menu)
+        }
         return true
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        val isListFragment = activeFragment is ListFragment
-        menu.findItem(R.id.menu_sort_date).isVisible = isListFragment
-        menu.findItem(R.id.menu_sort_name).isVisible = isListFragment
-        menu.findItem(R.id.menu_delete_all).isVisible = isListFragment
-        menu.findItem(R.id.menu_app_info).isVisible = true
+        menu.clear()
+        if (activeFragment is ListFragment) {
+            menuInflater.inflate(R.menu.option_menu, menu)
+        }
         return super.onPrepareOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.menu_sort_no -> {
+                listFragment.loadData("${DBHelper.COL_NO} DESC")
+                true
+            }
             R.id.menu_sort_date -> {
                 listFragment.loadData("${DBHelper.COL_DATE} DESC")
                 true
@@ -101,19 +109,8 @@ class MainActivity : AppCompatActivity() {
                 listFragment.loadData("${DBHelper.COL_PLACE} ASC")
                 true
             }
-            R.id.menu_delete_all -> {
-                AlertDialog.Builder(this)
-                    .setTitle("전체 삭제")
-                    .setMessage("모든 여행 기록을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.")
-                    .setPositiveButton("삭제") { _, _ ->
-                        listFragment.deleteAll()
-                    }
-                    .setNegativeButton("취소", null)
-                    .show()
-                true
-            }
-            R.id.menu_app_info -> {
-                binding.bottomNav.selectedItemId = R.id.nav_info
+            R.id.menu_select_delete -> {
+                listFragment.enterSelectMode()
                 true
             }
             else -> super.onOptionsItemSelected(item)
