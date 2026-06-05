@@ -1,8 +1,12 @@
 package com.example.traveldiary.fragment
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,7 +16,6 @@ import com.example.traveldiary.adapter.TravelAdapter
 import com.example.traveldiary.databinding.FragmentListBinding
 import com.example.traveldiary.db.DBHelper
 import com.example.traveldiary.model.TravelRecord
-import android.widget.Toast
 
 class ListFragment : Fragment() {
 
@@ -53,7 +56,6 @@ class ListFragment : Fragment() {
             }
         )
 
-        // 선택 개수 업데이트 콜백
         adapter.onSelectionChanged = {
             updateSelectCount()
         }
@@ -61,16 +63,13 @@ class ListFragment : Fragment() {
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        // FAB
         binding.fabAdd.setOnClickListener {
             val intent = Intent(requireContext(), AddEditActivity::class.java)
             startActivity(intent)
         }
 
-        // 전체 선택 텍스트
         binding.tvSelectAll.setOnClickListener {
             if (adapter.selectedItems.size == records.size) {
-                // 전체 선택 상태면 전체 해제
                 adapter.clearSelection()
             } else {
                 adapter.selectAll()
@@ -78,12 +77,10 @@ class ListFragment : Fragment() {
             updateSelectCount()
         }
 
-        // 취소 텍스트
         binding.tvCancelSelect.setOnClickListener {
             exitSelectMode()
         }
 
-        // 선택 항목 삭제 버튼
         binding.btnDeleteSelected.setOnClickListener {
             if (adapter.selectedItems.isEmpty()) {
                 AlertDialog.Builder(requireContext())
@@ -134,12 +131,9 @@ class ListFragment : Fragment() {
         }
     }
 
-    // 선택 개수 업데이트
     private fun updateSelectCount() {
         val count = adapter.selectedItems.size
         binding.tvSelectCount.text = "${count}개 선택됨"
-
-        // 전체 선택 텍스트 변경
         if (count == records.size && records.isNotEmpty()) {
             binding.tvSelectAll.text = "전체 해제"
         } else {
@@ -147,7 +141,6 @@ class ListFragment : Fragment() {
         }
     }
 
-    // 선택 삭제 모드 진입
     fun enterSelectMode() {
         adapter.isSelectMode = true
         adapter.selectedItems.clear()
@@ -159,7 +152,6 @@ class ListFragment : Fragment() {
         binding.tvSelectAll.text = "전체 선택"
     }
 
-    // 선택 삭제 모드 종료
     fun exitSelectMode() {
         adapter.clearSelectMode()
         binding.layoutSelectTopBar.visibility = View.GONE
@@ -169,26 +161,43 @@ class ListFragment : Fragment() {
 
     fun isSelectMode() = adapter.isSelectMode
 
+    // 롱클릭 컨텍스트 메뉴
     private fun showContextMenu(record: TravelRecord) {
+        // 고정 상태에 따라 메뉴 텍스트 변경
+        val pinText = if (record.isPinned == 1) "상단 고정 해제" else "상단 고정"
+
         AlertDialog.Builder(requireContext())
             .setTitle("📍 ${record.place}")
-            .setItems(arrayOf("✏️  수정", "🗑️  삭제")) { _, which ->
+            .setItems(arrayOf(pinText, "메모 복사")) { _, which ->
                 when (which) {
-                    0 -> {
-                        val intent = Intent(requireContext(), AddEditActivity::class.java)
-                        intent.putExtra("record_id", record.no)
-                        startActivity(intent)
-                    }
-                    1 -> showDeleteDialog(record)
+                    0 -> togglePin(record)
+                    1 -> copyMemo(record)
                 }
             }
             .show()
     }
 
-    private fun updateInfoFragment() {
-        val infoFragment = parentFragmentManager
-            .findFragmentByTag("info") as? InfoFragment
-        infoFragment?.updateStats()
+    // 상단 고정 / 해제
+    private fun togglePin(record: TravelRecord) {
+        val newPinState = if (record.isPinned == 1) 0 else 1
+        dbHelper.updatePin(record.no, newPinState)
+        loadData()
+        val message = if (newPinState == 1) "상단에 고정되었습니다" else "고정이 해제되었습니다"
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+
+    // 메모 복사
+    private fun copyMemo(record: TravelRecord) {
+        try {
+            val clipboard = requireContext()
+                .getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val text = "여행지명: ${record.place}\n날짜: ${record.visitDate}\n메모: ${record.memo}"
+            val clip = ClipData.newPlainText("여행 메모", text)
+            clipboard.setPrimaryClip(clip)
+            Toast.makeText(requireContext(), "클립보드에 복사되었습니다", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), "복사 중 오류가 발생했습니다", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun showDeleteDialog(record: TravelRecord) {
@@ -202,6 +211,12 @@ class ListFragment : Fragment() {
             }
             .setNegativeButton("취소", null)
             .show()
+    }
+
+    private fun updateInfoFragment() {
+        val infoFragment = parentFragmentManager
+            .findFragmentByTag("info") as? InfoFragment
+        infoFragment?.updateStats()
     }
 
     fun deleteAll() {

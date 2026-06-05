@@ -1,7 +1,6 @@
 package com.example.traveldiary.adapter
 
 import android.graphics.BitmapFactory
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +11,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.core.net.toUri
 
 class TravelAdapter(
     private val records: MutableList<TravelRecord>,
@@ -21,9 +21,9 @@ class TravelAdapter(
 
     var isSelectMode = false
     val selectedItems = mutableSetOf<Int>()
-    var onSelectionChanged: (() -> Unit)? = null  // 추가
+    var onSelectionChanged: (() -> Unit)? = null
 
-    inner class ViewHolder(val binding: ItemTravelBinding) :
+    class ViewHolder(val binding: ItemTravelBinding) :
         RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -41,6 +41,11 @@ class TravelAdapter(
         binding.tvDate.text = record.visitDate
         binding.tvMemoPreview.text = record.memo.ifEmpty { "메모 없음" }
 
+        // 고정 아이콘 표시
+        binding.tvPinIcon.visibility =
+            if (record.isPinned == 1) View.VISIBLE else View.GONE
+
+        // 선택 모드 UI
         if (isSelectMode) {
             binding.checkbox.visibility = View.VISIBLE
             binding.tvArrow.visibility = View.GONE
@@ -51,21 +56,24 @@ class TravelAdapter(
             binding.checkbox.isChecked = false
         }
 
+        // 클릭
         binding.root.setOnClickListener {
             if (isSelectMode) {
-                toggleSelection(record.no)
+                toggleSelection(position, record.no)
             } else {
                 onClick(record)
             }
         }
 
+        // 롱클릭
         binding.root.setOnLongClickListener {
             if (!isSelectMode) onLongClick(record)
             true
         }
 
+        // 체크박스 클릭
         binding.checkbox.setOnClickListener {
-            toggleSelection(record.no)
+            toggleSelection(position, record.no)
         }
 
         // 코루틴 비동기 이미지 로딩
@@ -78,7 +86,7 @@ class TravelAdapter(
                 val bitmap = try {
                     val context = holder.itemView.context
                     context.contentResolver
-                        .openInputStream(Uri.parse(record.photoUri))
+                        .openInputStream(record.photoUri.toUri())
                         ?.use { stream -> BitmapFactory.decodeStream(stream) }
                 } catch (e: Exception) {
                     null
@@ -102,39 +110,57 @@ class TravelAdapter(
         }
     }
 
-    private fun toggleSelection(no: Int) {
+    // 체크박스 토글
+    private fun toggleSelection(position: Int, no: Int) {
         if (selectedItems.contains(no)) {
             selectedItems.remove(no)
         } else {
             selectedItems.add(no)
         }
-        notifyDataSetChanged()
-        onSelectionChanged?.invoke()  // 콜백 호출
+        notifyItemChanged(position)
+        onSelectionChanged?.invoke()
     }
 
     override fun getItemCount() = records.size
 
+    // 전체 데이터 교체
     fun updateData(newList: List<TravelRecord>) {
+        val oldSize = records.size
         records.clear()
         records.addAll(newList)
-        notifyDataSetChanged()
+        val newSize = records.size
+
+        when {
+            oldSize == newSize -> notifyItemRangeChanged(0, newSize)
+            oldSize < newSize -> {
+                notifyItemRangeChanged(0, oldSize)
+                notifyItemRangeInserted(oldSize, newSize - oldSize)
+            }
+            else -> {
+                notifyItemRangeChanged(0, newSize)
+                notifyItemRangeRemoved(newSize, oldSize - newSize)
+            }
+        }
     }
 
+    // 전체 선택
     fun selectAll() {
         records.forEach { selectedItems.add(it.no) }
-        notifyDataSetChanged()
+        notifyItemRangeChanged(0, records.size)
         onSelectionChanged?.invoke()
     }
 
+    // 전체 해제
     fun clearSelection() {
         selectedItems.clear()
-        notifyDataSetChanged()
+        notifyItemRangeChanged(0, records.size)
         onSelectionChanged?.invoke()
     }
 
+    // 선택 모드 종료
     fun clearSelectMode() {
         isSelectMode = false
         selectedItems.clear()
-        notifyDataSetChanged()
+        notifyItemRangeChanged(0, records.size)
     }
 }

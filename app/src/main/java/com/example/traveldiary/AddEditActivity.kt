@@ -141,7 +141,7 @@ class AddEditActivity : AppCompatActivity() {
     private fun showImagePickerDialog() {
         AlertDialog.Builder(this)
             .setTitle("사진 선택")
-            .setItems(arrayOf("📷  카메라로 촬영", "🖼️  갤러리에서 선택")) { _, which ->
+            .setItems(arrayOf("카메라로 촬영", "갤러리에서 선택")) { _, which ->
                 when (which) {
                     0 -> checkCameraPermission()
                     1 -> galleryLauncher.launch(arrayOf("image/*"))
